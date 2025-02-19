@@ -34,11 +34,13 @@ export const createTodo = async (req, res, next) => {
     }
 }
 
-export const getAllTodos = async (req, res, next) => {
+export const getAllTodosOfUser = async (req, res, next) => {
+
+    const {userId} = req.params
 
     try {
 
-        const todos = await Todo.find()
+        const todos = await Todo.find({userId})
             .populate("userId")
             .lean() // Convert the document to a plain JavaScript object which optimizes the performance
 
@@ -56,27 +58,6 @@ export const getAllTodos = async (req, res, next) => {
 
         return res.status(200).json({
             todos: formattedTodos
-        })
-    }
-
-    catch (error) {
-        next(error)
-    }
-}
-
-export const getATodo = async (req, res, next) => {
-
-    const { id } = req.params
-
-    try {
-        const todo = await Todo.findById(id)
-            .populate("userId")
-            .lean()
-
-        const { title, isCompleted, createdAt, updatedAt, userId } = todo
-
-        return res.status(200).json({
-            todo: { id, title, isCompleted, createdAt, updatedAt, user: { id: userId._id, username: userId.username } }
         })
     }
 

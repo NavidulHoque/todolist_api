@@ -31,6 +31,27 @@ export const createTodoErrorHandler = async (req, res, next) => {
     }
 }
 
+export const getAllTodosErrorHandler = async (req, res, next) => {
+
+    const {userId} = req.params
+
+    try {
+        const user = mongoose.Types.ObjectId.isValid(userId) && await User.findById(userId)
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        next()
+    } 
+    
+    catch (error) {
+        next(error)
+    }
+}
+
 export const todoIdErrorHandler = async (req, res, next) => {
 
     const { id } = req.params
