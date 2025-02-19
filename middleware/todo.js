@@ -2,73 +2,49 @@ import mongoose from "mongoose"
 import { User } from "../models/User.js"
 import { Todo } from "../models/Todo.js"
 
+const validateId = async (id, model, res, next, entityName) => {
+
+    try {
+        const entity = mongoose.Types.ObjectId.isValid(id) && await model.findById(id)
+
+        if (!entity) {
+            return res.status(404).json({ 
+                message: `${entityName} not found` 
+            });
+        }
+
+        next();
+    } 
+    
+    catch (error) {
+        next(error);
+    }
+};
+
 export const createTodoErrorHandler = async (req, res, next) => {
 
     const { userId } = req.body
 
-    try {
+    if (!userId) {
 
-        if (!userId) {
-
-            return res.status(400).json({
-                message: "User ID is required"
-            })
-        }
-
-        const user = mongoose.Types.ObjectId.isValid(userId) && await User.findById(userId)
-
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found"
-            })
-        }
-
-        next()
+        return res.status(400).json({
+            message: "User ID is required"
+        })
     }
 
-    catch (error) {
-        next(error)
-    }
+    validateId(userId, User, res, next, "User")
 }
 
 export const getAllTodosErrorHandler = async (req, res, next) => {
 
-    const {userId} = req.params
+    const { userId } = req.params
 
-    try {
-        const user = mongoose.Types.ObjectId.isValid(userId) && await User.findById(userId)
-
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found"
-            })
-        }
-
-        next()
-    } 
-    
-    catch (error) {
-        next(error)
-    }
+    validateId(userId, User, res, next, "User")
 }
 
 export const todoIdErrorHandler = async (req, res, next) => {
 
     const { id } = req.params
 
-    try {
-        const todo = mongoose.Types.ObjectId.isValid(id) && await Todo.findById(id)
-
-        if (!todo) {
-            return res.status(404).json({
-                message: "Todo not found"
-            })
-        }
-
-        next()
-    } 
-    
-    catch (error) {
-        next(error)
-    }
+    validateId(id, Todo, res, next, "Todo");
 }
