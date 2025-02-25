@@ -1,11 +1,10 @@
 import express from 'express'
 import connectDatabase from './config/connectDatabase.js'
 import { PORT } from './config/config.js'
-import authRouter from './routes/auth.js'
-import TodoRouter from './routes/todo.js'
 import errorHandler from './middleware/errorHandler.js'
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { rateLimiter } from './middleware/rateLimiter.js'
+import { rootRouter } from './routes/root.js';
 
 const app = express()
 
@@ -18,8 +17,8 @@ app.get('/', (req, res) => {
     return res.send('Welcome to Todo List API!')
 })
 
-app.use('/auth', authRouter)
-app.use('/todos', TodoRouter)
+//handling all routes
+rootRouter(app)
 
 // not found route handler middleware
 app.use(notFoundHandler)
